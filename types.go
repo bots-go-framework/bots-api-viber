@@ -1,6 +1,13 @@
 package viberbotapi
 
 type MessageToViber interface {
+	isMessageToViber()
+}
+
+type isMessageToViber struct {
+}
+
+func (_ isMessageToViber) isMessageToViber() {
 }
 
 type ViberAuth struct {
@@ -8,6 +15,7 @@ type ViberAuth struct {
 }
 
 type SetWebhookMessage struct {
+	isMessageToViber
 	ViberAuth
 	Url        string `json:"url"`
 	EventTypes []string `json:"event_types,omitempty"`
@@ -37,6 +45,7 @@ type ViberBaseMessage struct {
 }
 
 type TextMessage struct {
+	isMessageToViber
 	ViberBaseMessage
 	Text         string `json:"name"`
 	TrackingData string `json:"tracking_data"`
@@ -49,12 +58,14 @@ type PictureMessage struct {
 }
 
 type VideoMessage struct {
+	isMessageToViber
 	PictureMessage
 	Size     int `json:"size"`
 	Duration int `json:"duration"`
 }
 
 type FileMessage struct {
+	isMessageToViber
 	ViberBaseMessage
 	Media    string `json:"media"`
 	FileName string `json:"file_name"`
@@ -67,6 +78,7 @@ type Contact struct {
 }
 
 type ContactMessage struct {
+	isMessageToViber
 	ViberBaseMessage
 	Contact Contact `json:"contact"`
 }
@@ -77,18 +89,27 @@ type Location struct {
 }
 
 type LocationMessage struct {
+	isMessageToViber
 	ViberBaseMessage
 	Location Location `json:"location"`
 }
 
 type UrlMessage struct {
+	isMessageToViber
 	ViberBaseMessage
 	Media    string `json:"media"`
 }
 
 type StickerMessage struct {
+	isMessageToViber
 	ViberBaseMessage
 	StickerID    string `json:"sticker_id"`
+}
+
+type KeyboardMessage struct {
+	isMessageToViber
+	ViberBaseMessage
+	Keyboard Keyboard `json:"keyboard"`
 }
 
 // https://developers.viber.com/customer/en/portal/articles/2632255-send-message?b_id=15145#send-message-response

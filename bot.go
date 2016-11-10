@@ -5,11 +5,11 @@ import "net/http"
 // BotAPI allows you to interact with the Telegram Bot API.
 type ViberBotApi struct {
 	httpClient http.Client
-	Token  string
+	token      string
 }
 
-func NewViberBotApiWithClient(token string, httpClient http.Client) ViberBotApi {
-	return ViberBotApi{Token: token, httpClient: httpClient}
+func NewViberBotApiWithHttpClient(token string, httpClient http.Client) ViberBotApi {
+	return ViberBotApi{token: token, httpClient: httpClient}
 }
 
 func (botApi ViberBotApi) SetWebhook(url string, eventTypes []string) error {
@@ -17,7 +17,7 @@ func (botApi ViberBotApi) SetWebhook(url string, eventTypes []string) error {
 		Url: url,
 		EventTypes: eventTypes,
 	}
-	m.Token = botApi.Token
+	m.Token = botApi.token
 	return botApi.SendMessage(m)
 }
 
