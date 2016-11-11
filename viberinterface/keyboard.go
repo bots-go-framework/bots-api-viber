@@ -1,4 +1,4 @@
-package viberbotapi
+package viberinterface
 
 type Keyboard struct {
 	Buttons []Button
