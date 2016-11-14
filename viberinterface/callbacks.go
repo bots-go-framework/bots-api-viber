@@ -7,7 +7,7 @@ type CallbackBase struct {
 }
 
 type CallbackOnMessage struct {
-	MessageToken string `json:"message_token"`
+	MessageToken int64 `json:"message_token"`
 	Sender CallbackSender `json:"sender"`
 	Message CallbackMessage `json:"message"`
 }
@@ -67,7 +67,7 @@ Example response: {"sender": { "name": "yarden from the pa", "avatar": "http://a
  */
 type CallbackOnConversationStarted struct {
 	CallbackBase
-	MessageToken string `json:"message_token"`
+	MessageToken int64 `json:"message_token"`
 	Type         string `json:"type"` // "open". Additional types may be added in the future.
 	Context      string `json:"context"`
 	User         CallbackUser `json:"user"`

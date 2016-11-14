@@ -51,9 +51,9 @@ type SetWebhookResponse struct {
 }
 
 type WebhookCallback struct {
-	Event        string `json:"event"`  // Callback type – which event triggered the callback: webhook
-	Timestamp    int `json:"timestamp"` // Epoch time of the event that triggered the callback
-	MessageToken string `json:"event"`  // Unique ID of the message
+	Event        string `json:"event"`         // Callback type – which event triggered the callback: webhook
+	Timestamp    int `json:"timestamp"`        // Epoch time of the event that triggered the callback
+	MessageToken int64 `json:"message_token"`  // Unique ID of the message
 }
 
 type PaSender struct {
@@ -228,5 +228,5 @@ func (_ KeyboardMessage) GetType() string {
 type SendMessageResponse struct {
 	Status        int `json:"status"`           // 0 for success, otherwise failure
 	StatusMessage string `json:"status_message"`
-	MessageToken  string `json:"message_token"` // Unique ID of the message
+	MessageToken  int64 `json:"message_token"` // Unique ID of the message
 }

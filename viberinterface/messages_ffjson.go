@@ -2947,7 +2947,7 @@ func (mj *SendMessageResponse) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	buf.WriteString(`,"status_message":`)
 	fflib.WriteJsonString(buf, string(mj.StatusMessage))
 	buf.WriteString(`,"message_token":`)
-	fflib.WriteJsonString(buf, string(mj.MessageToken))
+	fflib.FormatBits2(buf, uint64(mj.MessageToken), 10, mj.MessageToken < 0)
 	buf.WriteByte('}')
 	return nil
 }
@@ -3167,23 +3167,27 @@ handle_StatusMessage:
 
 handle_MessageToken:
 
-	/* handler: uj.MessageToken type=string kind=string quoted=false*/
+	/* handler: uj.MessageToken type=int64 kind=int64 quoted=false*/
 
 	{
-
-		{
-			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
-				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
-			}
+		if tok != fflib.FFTok_integer && tok != fflib.FFTok_null {
+			return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for int64", tok))
 		}
+	}
+
+	{
 
 		if tok == fflib.FFTok_null {
 
 		} else {
 
-			outBuf := fs.Output.Bytes()
+			tval, err := fflib.ParseInt(fs.Output.Bytes(), 10, 64)
 
-			uj.MessageToken = string(string(outBuf))
+			if err != nil {
+				return fs.WrapErr(err)
+			}
+
+			uj.MessageToken = int64(tval)
 
 		}
 	}
@@ -5716,8 +5720,8 @@ func (mj *WebhookCallback) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	fflib.WriteJsonString(buf, string(mj.Event))
 	buf.WriteString(`,"timestamp":`)
 	fflib.FormatBits2(buf, uint64(mj.Timestamp), 10, mj.Timestamp < 0)
-	buf.WriteString(`,"event":`)
-	fflib.WriteJsonString(buf, string(mj.MessageToken))
+	buf.WriteString(`,"message_token":`)
+	fflib.FormatBits2(buf, uint64(mj.MessageToken), 10, mj.MessageToken < 0)
 	buf.WriteByte('}')
 	return nil
 }
@@ -5737,7 +5741,7 @@ var ffj_key_WebhookCallback_Event = []byte("event")
 
 var ffj_key_WebhookCallback_Timestamp = []byte("timestamp")
 
-var ffj_key_WebhookCallback_MessageToken = []byte("event")
+var ffj_key_WebhookCallback_MessageToken = []byte("message_token")
 
 func (uj *WebhookCallback) UnmarshalJSON(input []byte) error {
 	fs := fflib.NewFFLexer(input)
@@ -5804,8 +5808,11 @@ mainparse:
 						currentKey = ffj_t_WebhookCallback_Event
 						state = fflib.FFParse_want_colon
 						goto mainparse
+					}
 
-					} else if bytes.Equal(ffj_key_WebhookCallback_MessageToken, kn) {
+				case 'm':
+
+					if bytes.Equal(ffj_key_WebhookCallback_MessageToken, kn) {
 						currentKey = ffj_t_WebhookCallback_MessageToken
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -5821,7 +5828,7 @@ mainparse:
 
 				}
 
-				if fflib.SimpleLetterEqualFold(ffj_key_WebhookCallback_MessageToken, kn) {
+				if fflib.EqualFoldRight(ffj_key_WebhookCallback_MessageToken, kn) {
 					currentKey = ffj_t_WebhookCallback_MessageToken
 					state = fflib.FFParse_want_colon
 					goto mainparse
@@ -5937,23 +5944,27 @@ handle_Timestamp:
 
 handle_MessageToken:
 
-	/* handler: uj.MessageToken type=string kind=string quoted=false*/
+	/* handler: uj.MessageToken type=int64 kind=int64 quoted=false*/
 
 	{
-
-		{
-			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
-				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
-			}
+		if tok != fflib.FFTok_integer && tok != fflib.FFTok_null {
+			return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for int64", tok))
 		}
+	}
+
+	{
 
 		if tok == fflib.FFTok_null {
 
 		} else {
 
-			outBuf := fs.Output.Bytes()
+			tval, err := fflib.ParseInt(fs.Output.Bytes(), 10, 64)
 
-			uj.MessageToken = string(string(outBuf))
+			if err != nil {
+				return fs.WrapErr(err)
+			}
+
+			uj.MessageToken = int64(tval)
 
 		}
 	}
