@@ -3,13 +3,14 @@ package viberinterface
 
 type CallbackBase struct {
 	Event   string `json:"event"`
-	Timestamp int `json:"timestamp"`
+	Timestamp int64 `json:"timestamp"`
 }
 
 type CallbackOnMessage struct {
+	CallbackBase
 	MessageToken int64 `json:"message_token"`
-	Sender CallbackSender `json:"sender"`
-	Message CallbackMessage `json:"message"`
+	Sender       CallbackSender `json:"sender"`
+	Message      Message `json:"message"`
 }
 
 type CallbackSender struct {
@@ -18,7 +19,7 @@ type CallbackSender struct {
 	Avatar string `json:"avatar"`
 }
 
-type CallbackMessage struct {
+type Message struct {
 	Type         string `json:"type"`
 	TrackingData string `json:"tracking_data"`
 	Text string `json:"text"`
@@ -28,9 +29,7 @@ type CallbackMessage struct {
 }
 
 type CallbackUser struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Avatar   string `json:"avatar"`
+	CallbackSender
 	Country  string `json:"country"`
 	Language string `json:"language"`
 }
