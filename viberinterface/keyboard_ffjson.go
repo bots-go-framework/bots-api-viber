@@ -35,12 +35,12 @@ func (mj *Button) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	_ = err
 	buf.WriteString(`{ `)
 	if mj.Columns != 0 {
-		buf.WriteString(`"columns":`)
+		buf.WriteString(`"Columns":`)
 		fflib.FormatBits2(buf, uint64(mj.Columns), 10, mj.Columns < 0)
 		buf.WriteByte(',')
 	}
 	if mj.Rows != 0 {
-		buf.WriteString(`"rows":`)
+		buf.WriteString(`"Rows":`)
 		fflib.FormatBits2(buf, uint64(mj.Rows), 10, mj.Rows < 0)
 		buf.WriteByte(',')
 	}
@@ -145,9 +145,9 @@ const (
 	ffj_t_Button_TextSize
 )
 
-var ffj_key_Button_Columns = []byte("columns")
+var ffj_key_Button_Columns = []byte("Columns")
 
-var ffj_key_Button_Rows = []byte("rows")
+var ffj_key_Button_Rows = []byte("Rows")
 
 var ffj_key_Button_BgColor = []byte("BgColor")
 
@@ -268,10 +268,26 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'C':
+
+					if bytes.Equal(ffj_key_Button_Columns, kn) {
+						currentKey = ffj_t_Button_Columns
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 'I':
 
 					if bytes.Equal(ffj_key_Button_Image, kn) {
 						currentKey = ffj_t_Button_Image
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 'R':
+
+					if bytes.Equal(ffj_key_Button_Rows, kn) {
+						currentKey = ffj_t_Button_Rows
 						state = fflib.FFParse_want_colon
 						goto mainparse
 					}
@@ -300,22 +316,6 @@ mainparse:
 
 					} else if bytes.Equal(ffj_key_Button_TextSize, kn) {
 						currentKey = ffj_t_Button_TextSize
-						state = fflib.FFParse_want_colon
-						goto mainparse
-					}
-
-				case 'c':
-
-					if bytes.Equal(ffj_key_Button_Columns, kn) {
-						currentKey = ffj_t_Button_Columns
-						state = fflib.FFParse_want_colon
-						goto mainparse
-					}
-
-				case 'r':
-
-					if bytes.Equal(ffj_key_Button_Rows, kn) {
-						currentKey = ffj_t_Button_Rows
 						state = fflib.FFParse_want_colon
 						goto mainparse
 					}
@@ -902,7 +902,9 @@ func (mj *Keyboard) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	var obj []byte
 	_ = obj
 	_ = err
-	buf.WriteString(`{ "Buttons":`)
+	buf.WriteString(`{ "Type":`)
+	fflib.WriteJsonString(buf, string(mj.Type))
+	buf.WriteString(`,"Buttons":`)
 	if mj.Buttons != nil {
 		buf.WriteString(`[`)
 		for i, v := range mj.Buttons {
@@ -946,12 +948,16 @@ const (
 	ffj_t_Keyboardbase = iota
 	ffj_t_Keyboardno_such_key
 
+	ffj_t_Keyboard_Type
+
 	ffj_t_Keyboard_Buttons
 
 	ffj_t_Keyboard_BgColor
 
 	ffj_t_Keyboard_DefaultHeight
 )
+
+var ffj_key_Keyboard_Type = []byte("Type")
 
 var ffj_key_Keyboard_Buttons = []byte("Buttons")
 
@@ -1039,6 +1045,14 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'T':
+
+					if bytes.Equal(ffj_key_Keyboard_Type, kn) {
+						currentKey = ffj_t_Keyboard_Type
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				}
 
 				if fflib.SimpleLetterEqualFold(ffj_key_Keyboard_DefaultHeight, kn) {
@@ -1059,6 +1073,12 @@ mainparse:
 					goto mainparse
 				}
 
+				if fflib.SimpleLetterEqualFold(ffj_key_Keyboard_Type, kn) {
+					currentKey = ffj_t_Keyboard_Type
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
 				currentKey = ffj_t_Keyboardno_such_key
 				state = fflib.FFParse_want_colon
 				goto mainparse
@@ -1075,6 +1095,9 @@ mainparse:
 
 			if tok == fflib.FFTok_left_brace || tok == fflib.FFTok_left_bracket || tok == fflib.FFTok_integer || tok == fflib.FFTok_double || tok == fflib.FFTok_string || tok == fflib.FFTok_bool || tok == fflib.FFTok_null {
 				switch currentKey {
+
+				case ffj_t_Keyboard_Type:
+					goto handle_Type
 
 				case ffj_t_Keyboard_Buttons:
 					goto handle_Buttons
@@ -1098,6 +1121,32 @@ mainparse:
 			}
 		}
 	}
+
+handle_Type:
+
+	/* handler: uj.Type type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Type = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
 
 handle_Buttons:
 

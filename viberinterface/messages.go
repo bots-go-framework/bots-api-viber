@@ -68,7 +68,7 @@ type BaseMessageToReceiver struct {
 	Sender       *PaSender `json:"sender,omitempty"`
 	MessageType  string `json:"type"`
 	Keyboard     *Keyboard `json:"keyboard,omitempty"`
-	TrackingData string `json:"tracking_data"`
+	TrackingData string `json:"tracking_data,omitempty"`
 }
 
 func (_ BaseMessageToReceiver) Endpoint() string {

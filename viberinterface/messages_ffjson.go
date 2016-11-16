@@ -68,9 +68,12 @@ func (mj *BaseMessageToReceiver) MarshalJSONBuf(buf fflib.EncodingBuffer) error 
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -775,9 +778,12 @@ func (mj *ContactMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -1283,9 +1289,12 @@ func (mj *FileMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -1885,9 +1894,12 @@ func (mj *KeyboardMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -2589,9 +2601,12 @@ func (mj *LocationMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -3334,9 +3349,12 @@ func (mj *PictureMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -4922,9 +4940,12 @@ func (mj *StickerMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -5428,9 +5449,12 @@ func (mj *TextMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -5934,9 +5958,12 @@ func (mj *UrlMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil
@@ -6639,9 +6666,12 @@ func (mj *VideoMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 			buf.WriteByte(',')
 		}
 	}
-	buf.WriteString(`"tracking_data":`)
-	fflib.WriteJsonString(buf, string(mj.TrackingData))
-	buf.WriteString(`,"auth_token":`)
+	if len(mj.TrackingData) != 0 {
+		buf.WriteString(`"tracking_data":`)
+		fflib.WriteJsonString(buf, string(mj.TrackingData))
+		buf.WriteByte(',')
+	}
+	buf.WriteString(`"auth_token":`)
 	fflib.WriteJsonString(buf, string(mj.Token))
 	buf.WriteByte('}')
 	return nil

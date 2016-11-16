@@ -1,6 +1,7 @@
 package viberinterface
 
 type Keyboard struct {
+	Type     string
 	Buttons []Button
 
 	// Background color of the keyboard.	Valid color HEX value.	By default Viber keyboard background.
@@ -14,12 +15,12 @@ type Keyboard struct {
 
 type Button struct {
 	// Button width in columns. Default is 6. Can be 1-6.
-	Columns     int `json:"columns,omitempty"`
+	Columns     int `json:",omitempty"`
 
 	// Button height in rows.
 	// Can be 1 or 2.Default is 1.
 	// Maximal number of keyboard rows is 12.
-	Rows        int `json:"rows,omitempty"`
+	Rows        int `json:",omitempty"`
 
 	// Background color of button. Valid color HEX value. Default: white
 	BgColor     string `json:",omitempty"`
