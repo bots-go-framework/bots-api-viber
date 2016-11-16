@@ -7,6 +7,7 @@ package viberinterface
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	fflib "github.com/pquerna/ffjson/fflib/v1"
 )
@@ -3821,29 +3822,21 @@ func (mj *Message) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	buf.WriteString(`,"media":`)
 	fflib.WriteJsonString(buf, string(mj.Media))
 	if mj.Location != nil {
+		/* Struct fall back. type=viberinterface.Location kind=struct */
 		buf.WriteString(`,"location":`)
-
-		{
-
-			err = mj.Location.MarshalJSONBuf(buf)
-			if err != nil {
-				return err
-			}
-
+		err = buf.Encode(mj.Location)
+		if err != nil {
+			return err
 		}
 	} else {
 		buf.WriteString(`,"location":null`)
 	}
 	if mj.Contact != nil {
+		/* Struct fall back. type=viberinterface.Contact kind=struct */
 		buf.WriteString(`,"contact":`)
-
-		{
-
-			err = mj.Contact.MarshalJSONBuf(buf)
-			if err != nil {
-				return err
-			}
-
+		err = buf.Encode(mj.Contact)
+		if err != nil {
+			return err
 		}
 	} else {
 		buf.WriteString(`,"contact":null`)
@@ -4178,23 +4171,16 @@ handle_Location:
 	/* handler: uj.Location type=viberinterface.Location kind=struct quoted=false*/
 
 	{
-		if tok == fflib.FFTok_null {
-
-			uj.Location = nil
-
-			state = fflib.FFParse_after_value
-			goto mainparse
-		}
-
-		if uj.Location == nil {
-			uj.Location = new(Location)
-		}
-
-		err = uj.Location.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		/* Falling back. type=viberinterface.Location kind=struct */
+		tbuf, err := fs.CaptureField(tok)
 		if err != nil {
-			return err
+			return fs.WrapErr(err)
 		}
-		state = fflib.FFParse_after_value
+
+		err = json.Unmarshal(tbuf, &uj.Location)
+		if err != nil {
+			return fs.WrapErr(err)
+		}
 	}
 
 	state = fflib.FFParse_after_value
@@ -4205,23 +4191,16 @@ handle_Contact:
 	/* handler: uj.Contact type=viberinterface.Contact kind=struct quoted=false*/
 
 	{
-		if tok == fflib.FFTok_null {
-
-			uj.Contact = nil
-
-			state = fflib.FFParse_after_value
-			goto mainparse
-		}
-
-		if uj.Contact == nil {
-			uj.Contact = new(Contact)
-		}
-
-		err = uj.Contact.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		/* Falling back. type=viberinterface.Contact kind=struct */
+		tbuf, err := fs.CaptureField(tok)
 		if err != nil {
-			return err
+			return fs.WrapErr(err)
 		}
-		state = fflib.FFParse_after_value
+
+		err = json.Unmarshal(tbuf, &uj.Contact)
+		if err != nil {
+			return fs.WrapErr(err)
+		}
 	}
 
 	state = fflib.FFParse_after_value

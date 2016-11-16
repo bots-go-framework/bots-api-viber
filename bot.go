@@ -24,8 +24,8 @@ func NewViberBotApiWithHttpClient(token string, httpClient *http.Client) *ViberB
 }
 
 func (botApi ViberBotApi) SetWebhook(url string, eventTypes []string) (response viberinterface.SetWebhookResponse, err error) {
-	var body []byte
-	if body, err = botApi.send(
+	var responseBody []byte
+	if _, responseBody, err = botApi.send(
 		&viberinterface.SetWebhookMessage{
 			ViberAuth: viberinterface.ViberAuth{Token: botApi.token},
 			Url: url,
@@ -35,50 +35,38 @@ func (botApi ViberBotApi) SetWebhook(url string, eventTypes []string) (response 
 		return
 	}
 
-	if err = ffjson.UnmarshalFast(body, &response); err != nil {
+	if err = ffjson.UnmarshalFast(responseBody, &response); err != nil {
 		err = errors.Wrap(err, "Failed to unmarshal response body to JSON")
 		return
 	}
 	return
 }
 
-func (botApi ViberBotApi) SendMessage(m viberinterface.MessageToReceiver) (response viberinterface.SendMessageResponse, err error) {
+func (botApi ViberBotApi) SendMessage(m viberinterface.MessageToReceiver) (requestBody []byte, response viberinterface.SendMessageResponse, err error) {
 	m.SetType(m.GetType())
-	var body []byte
-	if body, err = botApi.send(m); err != nil {
+	m.SetToken(botApi.token)
+	var responseBody []byte
+	if requestBody, responseBody, err = botApi.send(m); err != nil {
 		return
 	}
 
-	if err = ffjson.UnmarshalFast(body, &response); err != nil {
+	if err = ffjson.UnmarshalFast(responseBody, &response); err != nil {
 		err = errors.Wrap(err, "Failed to unmarshal response body to JSON")
-		return
 	}
-	return response, nil
+	return
 }
 
-func (bot ViberBotApi) send(m viberinterface.MessageToViberEndpoint) ([]byte, error) {
+func (bot ViberBotApi) send(m viberinterface.MessageToViberEndpoint) (requestBody []byte, responseBody[]byte, err error) {
+	if requestBody, err = ffjson.MarshalFast(m); err != nil {
+		return
+	}
+	var resp *http.Response
 	endpointUrl := VIBER_API_BASE_URL + m.Endpoint()
-	body, err := ffjson.MarshalFast(m)
-	if err != nil {
-		return nil, err
+	if resp, err = bot.httpClient.Post(endpointUrl, "applicaiton/json", bytes.NewReader(requestBody)); err != nil {
+		return
 	}
-	resp, err := bot.httpClient.Post(endpointUrl, "applicaiton/json", bytes.NewReader(body))
-	//if resp != nil {
-	//	//defer func() {
-	//	//	resp.Body.Close()
-	//	//}()
-	//	//if resp.Request != nil {
-	//	//	defer func() {
-	//	//		resp.Request.Body.Close()
-	//	//	}()
-	//	//}
-	//}
-	if err != nil {
-		return nil, err
+	if responseBody, err = ioutil.ReadAll(resp.Body); err != nil {
+		return
 	}
-	if body, err = ioutil.ReadAll(resp.Body); err != nil {
-		return nil, err
-	}
-
-	return body, err
+	return
 }

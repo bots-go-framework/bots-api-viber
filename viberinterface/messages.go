@@ -15,6 +15,7 @@ type MessageToReceiver interface {
 	isMessageToReceiver()
 	GetType() string
 	SetType(mType string)
+	SetToken(token string)
 }
 
 type isMessageToViber struct {
@@ -64,8 +65,8 @@ type PaSender struct {
 type BaseMessageToReceiver struct {
 	ViberAuth
 	Receiver     string `json:"receiver"`
-	Sender       *PaSender `json:"receiver,omitempty"`
-	mType        string `json:"type"`
+	Sender       *PaSender `json:"sender,omitempty"`
+	MessageType  string `json:"type"`
 	Keyboard     *Keyboard `json:"keyboard,omitempty"`
 	TrackingData string `json:"tracking_data"`
 }
@@ -75,7 +76,11 @@ func (_ BaseMessageToReceiver) Endpoint() string {
 }
 
 func (m *BaseMessageToReceiver) SetType(mType string) {
-	m.mType = mType
+	m.MessageType = mType
+}
+
+func (m *BaseMessageToReceiver) SetToken(token string) {
+	m.ViberAuth = ViberAuth{Token: token}
 }
 
 var _ MessageToReceiver = (*TextMessage)(nil)

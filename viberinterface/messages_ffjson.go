@@ -32,7 +32,27 @@ func (mj *BaseMessageToReceiver) MarshalJSONBuf(buf fflib.EncodingBuffer) error 
 	var obj []byte
 	_ = obj
 	_ = err
-	buf.WriteByte('{')
+	buf.WriteString(`{"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
+	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
 			buf.WriteString(`"keyboard":`)
@@ -60,12 +80,24 @@ const (
 	ffj_t_BaseMessageToReceiverbase = iota
 	ffj_t_BaseMessageToReceiverno_such_key
 
+	ffj_t_BaseMessageToReceiver_Receiver
+
+	ffj_t_BaseMessageToReceiver_Sender
+
+	ffj_t_BaseMessageToReceiver_MessageType
+
 	ffj_t_BaseMessageToReceiver_Keyboard
 
 	ffj_t_BaseMessageToReceiver_TrackingData
 
 	ffj_t_BaseMessageToReceiver_Token
 )
+
+var ffj_key_BaseMessageToReceiver_Receiver = []byte("receiver")
+
+var ffj_key_BaseMessageToReceiver_Sender = []byte("sender")
+
+var ffj_key_BaseMessageToReceiver_MessageType = []byte("type")
 
 var ffj_key_BaseMessageToReceiver_Keyboard = []byte("keyboard")
 
@@ -148,9 +180,30 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_BaseMessageToReceiver_Receiver, kn) {
+						currentKey = ffj_t_BaseMessageToReceiver_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 's':
+
+					if bytes.Equal(ffj_key_BaseMessageToReceiver_Sender, kn) {
+						currentKey = ffj_t_BaseMessageToReceiver_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 't':
 
-					if bytes.Equal(ffj_key_BaseMessageToReceiver_TrackingData, kn) {
+					if bytes.Equal(ffj_key_BaseMessageToReceiver_MessageType, kn) {
+						currentKey = ffj_t_BaseMessageToReceiver_MessageType
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_BaseMessageToReceiver_TrackingData, kn) {
 						currentKey = ffj_t_BaseMessageToReceiver_TrackingData
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -176,6 +229,24 @@ mainparse:
 					goto mainparse
 				}
 
+				if fflib.SimpleLetterEqualFold(ffj_key_BaseMessageToReceiver_MessageType, kn) {
+					currentKey = ffj_t_BaseMessageToReceiver_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_BaseMessageToReceiver_Sender, kn) {
+					currentKey = ffj_t_BaseMessageToReceiver_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_BaseMessageToReceiver_Receiver, kn) {
+					currentKey = ffj_t_BaseMessageToReceiver_Receiver
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
 				currentKey = ffj_t_BaseMessageToReceiverno_such_key
 				state = fflib.FFParse_want_colon
 				goto mainparse
@@ -192,6 +263,15 @@ mainparse:
 
 			if tok == fflib.FFTok_left_brace || tok == fflib.FFTok_left_bracket || tok == fflib.FFTok_integer || tok == fflib.FFTok_double || tok == fflib.FFTok_string || tok == fflib.FFTok_bool || tok == fflib.FFTok_null {
 				switch currentKey {
+
+				case ffj_t_BaseMessageToReceiver_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_BaseMessageToReceiver_Sender:
+					goto handle_Sender
+
+				case ffj_t_BaseMessageToReceiver_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_BaseMessageToReceiver_Keyboard:
 					goto handle_Keyboard
@@ -215,6 +295,85 @@ mainparse:
 			}
 		}
 	}
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
 
 handle_Keyboard:
 
@@ -580,6 +739,26 @@ func (mj *ContactMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 		}
 
 	}
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -610,6 +789,12 @@ const (
 
 	ffj_t_ContactMessage_Contact
 
+	ffj_t_ContactMessage_Receiver
+
+	ffj_t_ContactMessage_Sender
+
+	ffj_t_ContactMessage_MessageType
+
 	ffj_t_ContactMessage_Keyboard
 
 	ffj_t_ContactMessage_TrackingData
@@ -618,6 +803,12 @@ const (
 )
 
 var ffj_key_ContactMessage_Contact = []byte("contact")
+
+var ffj_key_ContactMessage_Receiver = []byte("receiver")
+
+var ffj_key_ContactMessage_Sender = []byte("sender")
+
+var ffj_key_ContactMessage_MessageType = []byte("type")
 
 var ffj_key_ContactMessage_Keyboard = []byte("keyboard")
 
@@ -708,9 +899,30 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_ContactMessage_Receiver, kn) {
+						currentKey = ffj_t_ContactMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 's':
+
+					if bytes.Equal(ffj_key_ContactMessage_Sender, kn) {
+						currentKey = ffj_t_ContactMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 't':
 
-					if bytes.Equal(ffj_key_ContactMessage_TrackingData, kn) {
+					if bytes.Equal(ffj_key_ContactMessage_MessageType, kn) {
+						currentKey = ffj_t_ContactMessage_MessageType
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_ContactMessage_TrackingData, kn) {
 						currentKey = ffj_t_ContactMessage_TrackingData
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -732,6 +944,24 @@ mainparse:
 
 				if fflib.EqualFoldRight(ffj_key_ContactMessage_Keyboard, kn) {
 					currentKey = ffj_t_ContactMessage_Keyboard
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_ContactMessage_MessageType, kn) {
+					currentKey = ffj_t_ContactMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_ContactMessage_Sender, kn) {
+					currentKey = ffj_t_ContactMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_ContactMessage_Receiver, kn) {
+					currentKey = ffj_t_ContactMessage_Receiver
 					state = fflib.FFParse_want_colon
 					goto mainparse
 				}
@@ -761,6 +991,15 @@ mainparse:
 
 				case ffj_t_ContactMessage_Contact:
 					goto handle_Contact
+
+				case ffj_t_ContactMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_ContactMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_ContactMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_ContactMessage_Keyboard:
 					goto handle_Keyboard
@@ -801,6 +1040,85 @@ handle_Contact:
 			return err
 		}
 		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
+
+		}
 	}
 
 	state = fflib.FFParse_after_value
@@ -929,6 +1247,26 @@ func (mj *FileMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	fflib.WriteJsonString(buf, string(mj.FileName))
 	buf.WriteString(`,"size":`)
 	fflib.FormatBits2(buf, uint64(mj.Size), 10, mj.Size < 0)
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -963,6 +1301,12 @@ const (
 
 	ffj_t_FileMessage_Size
 
+	ffj_t_FileMessage_Receiver
+
+	ffj_t_FileMessage_Sender
+
+	ffj_t_FileMessage_MessageType
+
 	ffj_t_FileMessage_Keyboard
 
 	ffj_t_FileMessage_TrackingData
@@ -975,6 +1319,12 @@ var ffj_key_FileMessage_Media = []byte("media")
 var ffj_key_FileMessage_FileName = []byte("file_name")
 
 var ffj_key_FileMessage_Size = []byte("size")
+
+var ffj_key_FileMessage_Receiver = []byte("receiver")
+
+var ffj_key_FileMessage_Sender = []byte("sender")
+
+var ffj_key_FileMessage_MessageType = []byte("type")
 
 var ffj_key_FileMessage_Keyboard = []byte("keyboard")
 
@@ -1073,17 +1423,35 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_FileMessage_Receiver, kn) {
+						currentKey = ffj_t_FileMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 's':
 
 					if bytes.Equal(ffj_key_FileMessage_Size, kn) {
 						currentKey = ffj_t_FileMessage_Size
 						state = fflib.FFParse_want_colon
 						goto mainparse
+
+					} else if bytes.Equal(ffj_key_FileMessage_Sender, kn) {
+						currentKey = ffj_t_FileMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
 					}
 
 				case 't':
 
-					if bytes.Equal(ffj_key_FileMessage_TrackingData, kn) {
+					if bytes.Equal(ffj_key_FileMessage_MessageType, kn) {
+						currentKey = ffj_t_FileMessage_MessageType
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_FileMessage_TrackingData, kn) {
 						currentKey = ffj_t_FileMessage_TrackingData
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -1105,6 +1473,24 @@ mainparse:
 
 				if fflib.EqualFoldRight(ffj_key_FileMessage_Keyboard, kn) {
 					currentKey = ffj_t_FileMessage_Keyboard
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_FileMessage_MessageType, kn) {
+					currentKey = ffj_t_FileMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_FileMessage_Sender, kn) {
+					currentKey = ffj_t_FileMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_FileMessage_Receiver, kn) {
+					currentKey = ffj_t_FileMessage_Receiver
 					state = fflib.FFParse_want_colon
 					goto mainparse
 				}
@@ -1152,6 +1538,15 @@ mainparse:
 
 				case ffj_t_FileMessage_Size:
 					goto handle_Size
+
+				case ffj_t_FileMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_FileMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_FileMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_FileMessage_Keyboard:
 					goto handle_Keyboard
@@ -1251,6 +1646,85 @@ handle_Size:
 			}
 
 			uj.Size = int(tval)
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
 
 		}
 	}
@@ -1375,7 +1849,27 @@ func (mj *KeyboardMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	var obj []byte
 	_ = obj
 	_ = err
-	buf.WriteByte('{')
+	buf.WriteString(`{"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
+	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
 			buf.WriteString(`"keyboard":`)
@@ -1403,12 +1897,24 @@ const (
 	ffj_t_KeyboardMessagebase = iota
 	ffj_t_KeyboardMessageno_such_key
 
+	ffj_t_KeyboardMessage_Receiver
+
+	ffj_t_KeyboardMessage_Sender
+
+	ffj_t_KeyboardMessage_MessageType
+
 	ffj_t_KeyboardMessage_Keyboard
 
 	ffj_t_KeyboardMessage_TrackingData
 
 	ffj_t_KeyboardMessage_Token
 )
+
+var ffj_key_KeyboardMessage_Receiver = []byte("receiver")
+
+var ffj_key_KeyboardMessage_Sender = []byte("sender")
+
+var ffj_key_KeyboardMessage_MessageType = []byte("type")
 
 var ffj_key_KeyboardMessage_Keyboard = []byte("keyboard")
 
@@ -1491,9 +1997,30 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_KeyboardMessage_Receiver, kn) {
+						currentKey = ffj_t_KeyboardMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 's':
+
+					if bytes.Equal(ffj_key_KeyboardMessage_Sender, kn) {
+						currentKey = ffj_t_KeyboardMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 't':
 
-					if bytes.Equal(ffj_key_KeyboardMessage_TrackingData, kn) {
+					if bytes.Equal(ffj_key_KeyboardMessage_MessageType, kn) {
+						currentKey = ffj_t_KeyboardMessage_MessageType
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_KeyboardMessage_TrackingData, kn) {
 						currentKey = ffj_t_KeyboardMessage_TrackingData
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -1519,6 +2046,24 @@ mainparse:
 					goto mainparse
 				}
 
+				if fflib.SimpleLetterEqualFold(ffj_key_KeyboardMessage_MessageType, kn) {
+					currentKey = ffj_t_KeyboardMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_KeyboardMessage_Sender, kn) {
+					currentKey = ffj_t_KeyboardMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_KeyboardMessage_Receiver, kn) {
+					currentKey = ffj_t_KeyboardMessage_Receiver
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
 				currentKey = ffj_t_KeyboardMessageno_such_key
 				state = fflib.FFParse_want_colon
 				goto mainparse
@@ -1535,6 +2080,15 @@ mainparse:
 
 			if tok == fflib.FFTok_left_brace || tok == fflib.FFTok_left_bracket || tok == fflib.FFTok_integer || tok == fflib.FFTok_double || tok == fflib.FFTok_string || tok == fflib.FFTok_bool || tok == fflib.FFTok_null {
 				switch currentKey {
+
+				case ffj_t_KeyboardMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_KeyboardMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_KeyboardMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_KeyboardMessage_Keyboard:
 					goto handle_Keyboard
@@ -1558,6 +2112,85 @@ mainparse:
 			}
 		}
 	}
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
 
 handle_Keyboard:
 
@@ -1920,6 +2553,26 @@ func (mj *LocationMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 		}
 
 	}
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -1950,6 +2603,12 @@ const (
 
 	ffj_t_LocationMessage_Location
 
+	ffj_t_LocationMessage_Receiver
+
+	ffj_t_LocationMessage_Sender
+
+	ffj_t_LocationMessage_MessageType
+
 	ffj_t_LocationMessage_Keyboard
 
 	ffj_t_LocationMessage_TrackingData
@@ -1958,6 +2617,12 @@ const (
 )
 
 var ffj_key_LocationMessage_Location = []byte("location")
+
+var ffj_key_LocationMessage_Receiver = []byte("receiver")
+
+var ffj_key_LocationMessage_Sender = []byte("sender")
+
+var ffj_key_LocationMessage_MessageType = []byte("type")
 
 var ffj_key_LocationMessage_Keyboard = []byte("keyboard")
 
@@ -2048,9 +2713,30 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_LocationMessage_Receiver, kn) {
+						currentKey = ffj_t_LocationMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 's':
+
+					if bytes.Equal(ffj_key_LocationMessage_Sender, kn) {
+						currentKey = ffj_t_LocationMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 't':
 
-					if bytes.Equal(ffj_key_LocationMessage_TrackingData, kn) {
+					if bytes.Equal(ffj_key_LocationMessage_MessageType, kn) {
+						currentKey = ffj_t_LocationMessage_MessageType
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_LocationMessage_TrackingData, kn) {
 						currentKey = ffj_t_LocationMessage_TrackingData
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -2072,6 +2758,24 @@ mainparse:
 
 				if fflib.EqualFoldRight(ffj_key_LocationMessage_Keyboard, kn) {
 					currentKey = ffj_t_LocationMessage_Keyboard
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_LocationMessage_MessageType, kn) {
+					currentKey = ffj_t_LocationMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_LocationMessage_Sender, kn) {
+					currentKey = ffj_t_LocationMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_LocationMessage_Receiver, kn) {
+					currentKey = ffj_t_LocationMessage_Receiver
 					state = fflib.FFParse_want_colon
 					goto mainparse
 				}
@@ -2101,6 +2805,15 @@ mainparse:
 
 				case ffj_t_LocationMessage_Location:
 					goto handle_Location
+
+				case ffj_t_LocationMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_LocationMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_LocationMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_LocationMessage_Keyboard:
 					goto handle_Keyboard
@@ -2141,6 +2854,85 @@ handle_Location:
 			return err
 		}
 		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
+
+		}
 	}
 
 	state = fflib.FFParse_after_value
@@ -2506,6 +3298,26 @@ func (mj *PictureMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	fflib.WriteJsonString(buf, string(mj.Thumbnail))
 	buf.WriteString(`,"text":`)
 	fflib.WriteJsonString(buf, string(mj.Text))
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -2540,6 +3352,12 @@ const (
 
 	ffj_t_PictureMessage_Text
 
+	ffj_t_PictureMessage_Receiver
+
+	ffj_t_PictureMessage_Sender
+
+	ffj_t_PictureMessage_MessageType
+
 	ffj_t_PictureMessage_Keyboard
 
 	ffj_t_PictureMessage_TrackingData
@@ -2552,6 +3370,12 @@ var ffj_key_PictureMessage_Media = []byte("media")
 var ffj_key_PictureMessage_Thumbnail = []byte("thumbnail")
 
 var ffj_key_PictureMessage_Text = []byte("text")
+
+var ffj_key_PictureMessage_Receiver = []byte("receiver")
+
+var ffj_key_PictureMessage_Sender = []byte("sender")
+
+var ffj_key_PictureMessage_MessageType = []byte("type")
 
 var ffj_key_PictureMessage_Keyboard = []byte("keyboard")
 
@@ -2642,6 +3466,22 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_PictureMessage_Receiver, kn) {
+						currentKey = ffj_t_PictureMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 's':
+
+					if bytes.Equal(ffj_key_PictureMessage_Sender, kn) {
+						currentKey = ffj_t_PictureMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 't':
 
 					if bytes.Equal(ffj_key_PictureMessage_Thumbnail, kn) {
@@ -2651,6 +3491,11 @@ mainparse:
 
 					} else if bytes.Equal(ffj_key_PictureMessage_Text, kn) {
 						currentKey = ffj_t_PictureMessage_Text
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_PictureMessage_MessageType, kn) {
+						currentKey = ffj_t_PictureMessage_MessageType
 						state = fflib.FFParse_want_colon
 						goto mainparse
 
@@ -2676,6 +3521,24 @@ mainparse:
 
 				if fflib.EqualFoldRight(ffj_key_PictureMessage_Keyboard, kn) {
 					currentKey = ffj_t_PictureMessage_Keyboard
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_PictureMessage_MessageType, kn) {
+					currentKey = ffj_t_PictureMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_PictureMessage_Sender, kn) {
+					currentKey = ffj_t_PictureMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_PictureMessage_Receiver, kn) {
+					currentKey = ffj_t_PictureMessage_Receiver
 					state = fflib.FFParse_want_colon
 					goto mainparse
 				}
@@ -2723,6 +3586,15 @@ mainparse:
 
 				case ffj_t_PictureMessage_Text:
 					goto handle_Text
+
+				case ffj_t_PictureMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_PictureMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_PictureMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_PictureMessage_Keyboard:
 					goto handle_Keyboard
@@ -2818,6 +3690,85 @@ handle_Text:
 			outBuf := fs.Output.Bytes()
 
 			uj.Text = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
 
 		}
 	}
@@ -3935,6 +4886,26 @@ func (mj *StickerMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	_ = err
 	buf.WriteString(`{"sticker_id":`)
 	fflib.WriteJsonString(buf, string(mj.StickerID))
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -3965,6 +4936,12 @@ const (
 
 	ffj_t_StickerMessage_StickerID
 
+	ffj_t_StickerMessage_Receiver
+
+	ffj_t_StickerMessage_Sender
+
+	ffj_t_StickerMessage_MessageType
+
 	ffj_t_StickerMessage_Keyboard
 
 	ffj_t_StickerMessage_TrackingData
@@ -3973,6 +4950,12 @@ const (
 )
 
 var ffj_key_StickerMessage_StickerID = []byte("sticker_id")
+
+var ffj_key_StickerMessage_Receiver = []byte("receiver")
+
+var ffj_key_StickerMessage_Sender = []byte("sender")
+
+var ffj_key_StickerMessage_MessageType = []byte("type")
 
 var ffj_key_StickerMessage_Keyboard = []byte("keyboard")
 
@@ -4055,17 +5038,35 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_StickerMessage_Receiver, kn) {
+						currentKey = ffj_t_StickerMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 's':
 
 					if bytes.Equal(ffj_key_StickerMessage_StickerID, kn) {
 						currentKey = ffj_t_StickerMessage_StickerID
 						state = fflib.FFParse_want_colon
 						goto mainparse
+
+					} else if bytes.Equal(ffj_key_StickerMessage_Sender, kn) {
+						currentKey = ffj_t_StickerMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
 					}
 
 				case 't':
 
-					if bytes.Equal(ffj_key_StickerMessage_TrackingData, kn) {
+					if bytes.Equal(ffj_key_StickerMessage_MessageType, kn) {
+						currentKey = ffj_t_StickerMessage_MessageType
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_StickerMessage_TrackingData, kn) {
 						currentKey = ffj_t_StickerMessage_TrackingData
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -4087,6 +5088,24 @@ mainparse:
 
 				if fflib.EqualFoldRight(ffj_key_StickerMessage_Keyboard, kn) {
 					currentKey = ffj_t_StickerMessage_Keyboard
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_StickerMessage_MessageType, kn) {
+					currentKey = ffj_t_StickerMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_StickerMessage_Sender, kn) {
+					currentKey = ffj_t_StickerMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_StickerMessage_Receiver, kn) {
+					currentKey = ffj_t_StickerMessage_Receiver
 					state = fflib.FFParse_want_colon
 					goto mainparse
 				}
@@ -4116,6 +5135,15 @@ mainparse:
 
 				case ffj_t_StickerMessage_StickerID:
 					goto handle_StickerID
+
+				case ffj_t_StickerMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_StickerMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_StickerMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_StickerMessage_Keyboard:
 					goto handle_Keyboard
@@ -4159,6 +5187,85 @@ handle_StickerID:
 			outBuf := fs.Output.Bytes()
 
 			uj.StickerID = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
 
 		}
 	}
@@ -4285,6 +5392,26 @@ func (mj *TextMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	_ = err
 	buf.WriteString(`{"text":`)
 	fflib.WriteJsonString(buf, string(mj.Text))
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -4315,6 +5442,12 @@ const (
 
 	ffj_t_TextMessage_Text
 
+	ffj_t_TextMessage_Receiver
+
+	ffj_t_TextMessage_Sender
+
+	ffj_t_TextMessage_MessageType
+
 	ffj_t_TextMessage_Keyboard
 
 	ffj_t_TextMessage_TrackingData
@@ -4323,6 +5456,12 @@ const (
 )
 
 var ffj_key_TextMessage_Text = []byte("text")
+
+var ffj_key_TextMessage_Receiver = []byte("receiver")
+
+var ffj_key_TextMessage_Sender = []byte("sender")
+
+var ffj_key_TextMessage_MessageType = []byte("type")
 
 var ffj_key_TextMessage_Keyboard = []byte("keyboard")
 
@@ -4405,10 +5544,31 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_TextMessage_Receiver, kn) {
+						currentKey = ffj_t_TextMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 's':
+
+					if bytes.Equal(ffj_key_TextMessage_Sender, kn) {
+						currentKey = ffj_t_TextMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 't':
 
 					if bytes.Equal(ffj_key_TextMessage_Text, kn) {
 						currentKey = ffj_t_TextMessage_Text
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_TextMessage_MessageType, kn) {
+						currentKey = ffj_t_TextMessage_MessageType
 						state = fflib.FFParse_want_colon
 						goto mainparse
 
@@ -4438,6 +5598,24 @@ mainparse:
 					goto mainparse
 				}
 
+				if fflib.SimpleLetterEqualFold(ffj_key_TextMessage_MessageType, kn) {
+					currentKey = ffj_t_TextMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_TextMessage_Sender, kn) {
+					currentKey = ffj_t_TextMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_TextMessage_Receiver, kn) {
+					currentKey = ffj_t_TextMessage_Receiver
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
 				if fflib.SimpleLetterEqualFold(ffj_key_TextMessage_Text, kn) {
 					currentKey = ffj_t_TextMessage_Text
 					state = fflib.FFParse_want_colon
@@ -4463,6 +5641,15 @@ mainparse:
 
 				case ffj_t_TextMessage_Text:
 					goto handle_Text
+
+				case ffj_t_TextMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_TextMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_TextMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_TextMessage_Keyboard:
 					goto handle_Keyboard
@@ -4506,6 +5693,85 @@ handle_Text:
 			outBuf := fs.Output.Bytes()
 
 			uj.Text = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
 
 		}
 	}
@@ -4632,6 +5898,26 @@ func (mj *UrlMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	_ = err
 	buf.WriteString(`{"media":`)
 	fflib.WriteJsonString(buf, string(mj.Media))
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -4662,6 +5948,12 @@ const (
 
 	ffj_t_UrlMessage_Media
 
+	ffj_t_UrlMessage_Receiver
+
+	ffj_t_UrlMessage_Sender
+
+	ffj_t_UrlMessage_MessageType
+
 	ffj_t_UrlMessage_Keyboard
 
 	ffj_t_UrlMessage_TrackingData
@@ -4670,6 +5962,12 @@ const (
 )
 
 var ffj_key_UrlMessage_Media = []byte("media")
+
+var ffj_key_UrlMessage_Receiver = []byte("receiver")
+
+var ffj_key_UrlMessage_Sender = []byte("sender")
+
+var ffj_key_UrlMessage_MessageType = []byte("type")
 
 var ffj_key_UrlMessage_Keyboard = []byte("keyboard")
 
@@ -4760,9 +6058,30 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_UrlMessage_Receiver, kn) {
+						currentKey = ffj_t_UrlMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
+				case 's':
+
+					if bytes.Equal(ffj_key_UrlMessage_Sender, kn) {
+						currentKey = ffj_t_UrlMessage_Sender
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 't':
 
-					if bytes.Equal(ffj_key_UrlMessage_TrackingData, kn) {
+					if bytes.Equal(ffj_key_UrlMessage_MessageType, kn) {
+						currentKey = ffj_t_UrlMessage_MessageType
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_UrlMessage_TrackingData, kn) {
 						currentKey = ffj_t_UrlMessage_TrackingData
 						state = fflib.FFParse_want_colon
 						goto mainparse
@@ -4784,6 +6103,24 @@ mainparse:
 
 				if fflib.EqualFoldRight(ffj_key_UrlMessage_Keyboard, kn) {
 					currentKey = ffj_t_UrlMessage_Keyboard
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_UrlMessage_MessageType, kn) {
+					currentKey = ffj_t_UrlMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_UrlMessage_Sender, kn) {
+					currentKey = ffj_t_UrlMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_UrlMessage_Receiver, kn) {
+					currentKey = ffj_t_UrlMessage_Receiver
 					state = fflib.FFParse_want_colon
 					goto mainparse
 				}
@@ -4813,6 +6150,15 @@ mainparse:
 
 				case ffj_t_UrlMessage_Media:
 					goto handle_Media
+
+				case ffj_t_UrlMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_UrlMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_UrlMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_UrlMessage_Keyboard:
 					goto handle_Keyboard
@@ -4856,6 +6202,85 @@ handle_Media:
 			outBuf := fs.Output.Bytes()
 
 			uj.Media = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
 
 		}
 	}
@@ -5178,6 +6603,26 @@ func (mj *VideoMessage) MarshalJSONBuf(buf fflib.EncodingBuffer) error {
 	fflib.WriteJsonString(buf, string(mj.Thumbnail))
 	buf.WriteString(`,"text":`)
 	fflib.WriteJsonString(buf, string(mj.Text))
+	buf.WriteString(`,"receiver":`)
+	fflib.WriteJsonString(buf, string(mj.Receiver))
+	buf.WriteByte(',')
+	if mj.Sender != nil {
+		if true {
+			buf.WriteString(`"sender":`)
+
+			{
+
+				err = mj.Sender.MarshalJSONBuf(buf)
+				if err != nil {
+					return err
+				}
+
+			}
+			buf.WriteByte(',')
+		}
+	}
+	buf.WriteString(`"type":`)
+	fflib.WriteJsonString(buf, string(mj.MessageType))
 	buf.WriteByte(',')
 	if mj.Keyboard != nil {
 		if true {
@@ -5216,6 +6661,12 @@ const (
 
 	ffj_t_VideoMessage_Text
 
+	ffj_t_VideoMessage_Receiver
+
+	ffj_t_VideoMessage_Sender
+
+	ffj_t_VideoMessage_MessageType
+
 	ffj_t_VideoMessage_Keyboard
 
 	ffj_t_VideoMessage_TrackingData
@@ -5232,6 +6683,12 @@ var ffj_key_VideoMessage_Media = []byte("media")
 var ffj_key_VideoMessage_Thumbnail = []byte("thumbnail")
 
 var ffj_key_VideoMessage_Text = []byte("text")
+
+var ffj_key_VideoMessage_Receiver = []byte("receiver")
+
+var ffj_key_VideoMessage_Sender = []byte("sender")
+
+var ffj_key_VideoMessage_MessageType = []byte("type")
 
 var ffj_key_VideoMessage_Keyboard = []byte("keyboard")
 
@@ -5330,10 +6787,23 @@ mainparse:
 						goto mainparse
 					}
 
+				case 'r':
+
+					if bytes.Equal(ffj_key_VideoMessage_Receiver, kn) {
+						currentKey = ffj_t_VideoMessage_Receiver
+						state = fflib.FFParse_want_colon
+						goto mainparse
+					}
+
 				case 's':
 
 					if bytes.Equal(ffj_key_VideoMessage_Size, kn) {
 						currentKey = ffj_t_VideoMessage_Size
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_VideoMessage_Sender, kn) {
+						currentKey = ffj_t_VideoMessage_Sender
 						state = fflib.FFParse_want_colon
 						goto mainparse
 					}
@@ -5347,6 +6817,11 @@ mainparse:
 
 					} else if bytes.Equal(ffj_key_VideoMessage_Text, kn) {
 						currentKey = ffj_t_VideoMessage_Text
+						state = fflib.FFParse_want_colon
+						goto mainparse
+
+					} else if bytes.Equal(ffj_key_VideoMessage_MessageType, kn) {
+						currentKey = ffj_t_VideoMessage_MessageType
 						state = fflib.FFParse_want_colon
 						goto mainparse
 
@@ -5372,6 +6847,24 @@ mainparse:
 
 				if fflib.EqualFoldRight(ffj_key_VideoMessage_Keyboard, kn) {
 					currentKey = ffj_t_VideoMessage_Keyboard
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_VideoMessage_MessageType, kn) {
+					currentKey = ffj_t_VideoMessage_MessageType
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.EqualFoldRight(ffj_key_VideoMessage_Sender, kn) {
+					currentKey = ffj_t_VideoMessage_Sender
+					state = fflib.FFParse_want_colon
+					goto mainparse
+				}
+
+				if fflib.SimpleLetterEqualFold(ffj_key_VideoMessage_Receiver, kn) {
+					currentKey = ffj_t_VideoMessage_Receiver
 					state = fflib.FFParse_want_colon
 					goto mainparse
 				}
@@ -5437,6 +6930,15 @@ mainparse:
 
 				case ffj_t_VideoMessage_Text:
 					goto handle_Text
+
+				case ffj_t_VideoMessage_Receiver:
+					goto handle_Receiver
+
+				case ffj_t_VideoMessage_Sender:
+					goto handle_Sender
+
+				case ffj_t_VideoMessage_MessageType:
+					goto handle_MessageType
 
 				case ffj_t_VideoMessage_Keyboard:
 					goto handle_Keyboard
@@ -5592,6 +7094,85 @@ handle_Text:
 			outBuf := fs.Output.Bytes()
 
 			uj.Text = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Receiver:
+
+	/* handler: uj.Receiver type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.Receiver = string(string(outBuf))
+
+		}
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_Sender:
+
+	/* handler: uj.Sender type=viberinterface.PaSender kind=struct quoted=false*/
+
+	{
+		if tok == fflib.FFTok_null {
+
+			uj.Sender = nil
+
+			state = fflib.FFParse_after_value
+			goto mainparse
+		}
+
+		if uj.Sender == nil {
+			uj.Sender = new(PaSender)
+		}
+
+		err = uj.Sender.UnmarshalJSONFFLexer(fs, fflib.FFParse_want_key)
+		if err != nil {
+			return err
+		}
+		state = fflib.FFParse_after_value
+	}
+
+	state = fflib.FFParse_after_value
+	goto mainparse
+
+handle_MessageType:
+
+	/* handler: uj.MessageType type=string kind=string quoted=false*/
+
+	{
+
+		{
+			if tok != fflib.FFTok_string && tok != fflib.FFTok_null {
+				return fs.WrapErr(fmt.Errorf("cannot unmarshal %s into Go value for string", tok))
+			}
+		}
+
+		if tok == fflib.FFTok_null {
+
+		} else {
+
+			outBuf := fs.Output.Bytes()
+
+			uj.MessageType = string(string(outBuf))
 
 		}
 	}
