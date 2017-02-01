@@ -13,6 +13,20 @@ type Keyboard struct {
 	DefaultHeight bool `json:",omitempty"` // Default: false
 }
 
+const (
+	TypeKeyboard = "keyboard"
+	ActionTypeOpenUrl = "open-url"
+)
+
+func NewKeyboard(BgColor string, DefaultHeight bool, Buttons ...Button) *Keyboard {
+	return &Keyboard{
+		Type: TypeKeyboard,
+		BgColor: BgColor,
+		DefaultHeight: DefaultHeight,
+		Buttons: Buttons,
+	}
+}
+
 type Button struct {
 	// Button width in columns. Default is 6. Can be 1-6.
 	Columns     int `json:",omitempty"`
