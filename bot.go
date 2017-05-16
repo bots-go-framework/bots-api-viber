@@ -56,13 +56,13 @@ func (botApi ViberBotApi) SendMessage(m viberinterface.MessageToReceiver) (reque
 	return
 }
 
-func (bot ViberBotApi) send(m viberinterface.MessageToViberEndpoint) (requestBody []byte, responseBody[]byte, err error) {
+func (botApi ViberBotApi) send(m viberinterface.MessageToViberEndpoint) (requestBody []byte, responseBody[]byte, err error) {
 	if requestBody, err = ffjson.MarshalFast(m); err != nil {
 		return
 	}
 	var resp *http.Response
 	endpointUrl := VIBER_API_BASE_URL + m.Endpoint()
-	if resp, err = bot.httpClient.Post(endpointUrl, "applicaiton/json", bytes.NewReader(requestBody)); err != nil {
+	if resp, err = botApi.httpClient.Post(endpointUrl, "applicaiton/json", bytes.NewReader(requestBody)); err != nil {
 		return
 	}
 	if responseBody, err = ioutil.ReadAll(resp.Body); err != nil {
