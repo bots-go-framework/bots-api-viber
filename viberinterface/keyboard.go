@@ -1,5 +1,7 @@
 package viberinterface
 
+import "github.com/strongo/bots-framework/core"
+
 type Keyboard struct {
 	Type     string
 	Buttons []Button
@@ -12,6 +14,12 @@ type Keyboard struct {
 	// Maximal height will be native keyboard height.
 	DefaultHeight bool `json:",omitempty"` // Default: false
 }
+
+func (*Keyboard) KeyboardType() bots.KeyboardType {
+	return bots.KeyboardTypeBottom
+}
+
+var _ bots.Keyboard = (*Keyboard)(nil)
 
 const (
 	TypeKeyboard = "keyboard"
