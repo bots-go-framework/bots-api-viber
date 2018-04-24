@@ -519,7 +519,7 @@ func (mj *CallbackOnConversationStarted) MarshalJSONBuf(buf fflib.EncodingBuffer
 	fflib.FormatBits2(buf, uint64(mj.MessageToken), 10, mj.MessageToken < 0)
 	buf.WriteString(`,"type":`)
 	fflib.WriteJsonString(buf, string(mj.Type))
-	buf.WriteString(`,"golang.org/x/net/context":`)
+	buf.WriteString(`,"context":`)
 	fflib.WriteJsonString(buf, string(mj.Context))
 	buf.WriteString(`,"user":`)
 
@@ -560,7 +560,7 @@ var ffj_key_CallbackOnConversationStarted_MessageToken = []byte("message_token")
 
 var ffj_key_CallbackOnConversationStarted_Type = []byte("type")
 
-var ffj_key_CallbackOnConversationStarted_Context = []byte("golang.org/x/net/context")
+var ffj_key_CallbackOnConversationStarted_Context = []byte("context")
 
 var ffj_key_CallbackOnConversationStarted_User = []byte("user")
 

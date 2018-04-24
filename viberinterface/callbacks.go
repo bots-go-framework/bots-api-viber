@@ -68,7 +68,7 @@ type CallbackOnConversationStarted struct {
 	CallbackBase
 	MessageToken int64 `json:"message_token"`
 	Type         string `json:"type"` // "open". Additional types may be added in the future.
-	Context      string `json:"golang.org/x/net/context"`
+	Context      string `json:"context"`
 	User         CallbackUser `json:"user"`
 }
 
