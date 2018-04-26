@@ -21,10 +21,10 @@ type MessageToReceiver interface {
 type isMessageToViber struct {
 }
 
-func (_ isMessageToViber) isMessageToViberEndpoint() {
+func (isMessageToViber) isMessageToViberEndpoint() {
 }
 
-func (_ BaseMessageToReceiver) isMessageToReceiver() {
+func (BaseMessageToReceiver) isMessageToReceiver() {
 }
 
 
@@ -41,7 +41,7 @@ type SetWebhookMessage struct {
 	EventTypes []string `json:"event_types,omitempty"`
 }
 
-func (_ SetWebhookMessage) Endpoint() string {
+func (SetWebhookMessage) Endpoint() string {
 	return endpointSetWebhook
 }
 
@@ -71,7 +71,7 @@ type BaseMessageToReceiver struct {
 	TrackingData string `json:"tracking_data,omitempty"`
 }
 
-func (_ BaseMessageToReceiver) Endpoint() string {
+func (BaseMessageToReceiver) Endpoint() string {
 	return endpointSendMessage
 }
 
@@ -91,7 +91,7 @@ type TextMessage struct {
 	Text string `json:"text"`
 }
 
-func (_ TextMessage) GetType() string {
+func (TextMessage) GetType() string {
 	return "text"
 }
 
@@ -114,7 +114,7 @@ type PictureMessage struct {
 	Thumbnail string `json:"thumbnail"`
 }
 
-func (_ PictureMessage) GetType() string {
+func (PictureMessage) GetType() string {
 	return "picture"
 }
 
@@ -127,7 +127,7 @@ type VideoMessage struct {
 	Duration int `json:"duration"`
 }
 
-func (_ VideoMessage) GetType() string {
+func (VideoMessage) GetType() string {
 	return "video"
 }
 
@@ -141,7 +141,7 @@ type FileMessage struct {
 	Size     int `json:"size"`
 }
 
-func (_ FileMessage) GetType() string {
+func (FileMessage) GetType() string {
 	return "file"
 }
 
@@ -158,7 +158,7 @@ type ContactMessage struct {
 	Contact Contact `json:"contact"`
 }
 
-func (_ ContactMessage) GetType() string {
+func (ContactMessage) GetType() string {
 	return "contact"
 }
 
@@ -175,7 +175,7 @@ type LocationMessage struct {
 	Location Location `json:"location"`
 }
 
-func (_ LocationMessage) GetType() string {
+func (LocationMessage) GetType() string {
 	return "location"
 }
 
@@ -187,7 +187,7 @@ type UrlMessage struct {
 	Media string `json:"media"`
 }
 
-func (_ UrlMessage) GetType() string {
+func (UrlMessage) GetType() string {
 	return "url"
 }
 
@@ -199,7 +199,7 @@ type StickerMessage struct {
 	StickerID string `json:"sticker_id"`
 }
 
-func (_ StickerMessage) GetType() string {
+func (StickerMessage) GetType() string {
 	return "sticker"
 }
 
@@ -224,7 +224,7 @@ func NewKeyboardMessage(receiver, trackingData string, keyboard *Keyboard) *Keyb
 	}
 }
 
-func (_ KeyboardMessage) GetType() string {
+func (KeyboardMessage) GetType() string {
 	return "keyboard"
 }
 
