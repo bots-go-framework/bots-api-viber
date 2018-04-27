@@ -1,7 +1,7 @@
 package viberinterface
 
-const(
-	endpointSetWebhook = "set_webhook"
+const (
+	endpointSetWebhook  = "set_webhook"
 	endpointSendMessage = "send_message"
 )
 
@@ -27,7 +27,6 @@ func (isMessageToViber) isMessageToViberEndpoint() {
 func (BaseMessageToReceiver) isMessageToReceiver() {
 }
 
-
 type ViberAuth struct {
 	Token string `json:"auth_token"`
 }
@@ -37,7 +36,7 @@ var _ MessageToViberEndpoint = (*SetWebhookMessage)(nil)
 type SetWebhookMessage struct {
 	isMessageToViber
 	ViberAuth
-	Url        string `json:"url"`
+	Url        string   `json:"url"`
 	EventTypes []string `json:"event_types,omitempty"`
 }
 
@@ -46,15 +45,15 @@ func (SetWebhookMessage) Endpoint() string {
 }
 
 type SetWebhookResponse struct {
-	Status        int `json:"status"`
-	StatusMessage string `json:"status_message"`
+	Status        int      `json:"status"`
+	StatusMessage string   `json:"status_message"`
 	EventTypes    []string `json:"event_types,omitempty"`
 }
 
 type WebhookCallback struct {
 	Event        string `json:"event"`         // Callback type – which event triggered the callback: webhook
-	Timestamp    int `json:"timestamp"`        // Epoch time of the event that triggered the callback
-	MessageToken int64 `json:"message_token"`  // Unique ID of the message
+	Timestamp    int    `json:"timestamp"`     // Epoch time of the event that triggered the callback
+	MessageToken int64  `json:"message_token"` // Unique ID of the message
 }
 
 type PaSender struct {
@@ -64,11 +63,11 @@ type PaSender struct {
 
 type BaseMessageToReceiver struct {
 	ViberAuth
-	Receiver     string `json:"receiver"`
+	Receiver     string    `json:"receiver"`
 	Sender       *PaSender `json:"sender,omitempty"`
-	MessageType  string `json:"type"`
+	MessageType  string    `json:"type"`
 	Keyboard     *Keyboard `json:"keyboard,omitempty"`
-	TrackingData string `json:"tracking_data,omitempty"`
+	TrackingData string    `json:"tracking_data,omitempty"`
 }
 
 func (BaseMessageToReceiver) Endpoint() string {
@@ -99,9 +98,9 @@ func NewTextMessage(receiver, trackingData, text string, keyboard *Keyboard) *Te
 	return &TextMessage{
 		Text: text,
 		BaseMessageToReceiver: BaseMessageToReceiver{
-			Receiver: receiver,
+			Receiver:     receiver,
 			TrackingData: trackingData,
-			Keyboard: keyboard,
+			Keyboard:     keyboard,
 		},
 	}
 }
@@ -138,7 +137,7 @@ type FileMessage struct {
 	BaseMessageToReceiver
 	Media    string `json:"media"`
 	FileName string `json:"file_name"`
-	Size     int `json:"size"`
+	Size     int    `json:"size"`
 }
 
 func (FileMessage) GetType() string {
@@ -217,9 +216,9 @@ func NewKeyboardMessage(receiver, trackingData string, keyboard *Keyboard) *Keyb
 	}
 	return &KeyboardMessage{
 		BaseMessageToReceiver: BaseMessageToReceiver{
-			Receiver: receiver,
+			Receiver:     receiver,
 			TrackingData: trackingData,
-			Keyboard: keyboard,
+			Keyboard:     keyboard,
 		},
 	}
 }
@@ -228,10 +227,9 @@ func (KeyboardMessage) GetType() string {
 	return "keyboard"
 }
 
-
 // https://developers.viber.com/customer/en/portal/articles/2632255-send-message?b_id=15145#send-message-response
 type SendMessageResponse struct {
-	Status        int `json:"status"`           // 0 for success, otherwise failure
+	Status        int    `json:"status"` // 0 for success, otherwise failure
 	StatusMessage string `json:"status_message"`
-	MessageToken  int64 `json:"message_token"` // Unique ID of the message
+	MessageToken  int64  `json:"message_token"` // Unique ID of the message
 }

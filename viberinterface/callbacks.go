@@ -1,31 +1,30 @@
 package viberinterface
 
-
 type CallbackBase struct {
-	Event   string `json:"event"`
-	Timestamp int64 `json:"timestamp"`
+	Event     string `json:"event"`
+	Timestamp int64  `json:"timestamp"`
 }
 
 type CallbackOnMessage struct {
 	CallbackBase
-	MessageToken int64 `json:"message_token"`
+	MessageToken int64          `json:"message_token"`
 	Sender       CallbackSender `json:"sender"`
-	Message      Message `json:"message"`
+	Message      Message        `json:"message"`
 }
 
 type CallbackSender struct {
-	ID string `json:"id"`
+	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Avatar string `json:"avatar"`
 }
 
 type Message struct {
-	Type         string `json:"type"`
-	TrackingData string `json:"tracking_data"`
-	Text string `json:"text"`
-	Media string `json:"media"`
-	Location *Location `json:"location"`
-	Contact *Contact `json:"contact"`
+	Type         string    `json:"type"`
+	TrackingData string    `json:"tracking_data"`
+	Text         string    `json:"text"`
+	Media        string    `json:"media"`
+	Location     *Location `json:"location"`
+	Contact      *Contact  `json:"contact"`
 }
 
 type CallbackUser struct {
@@ -63,12 +62,12 @@ Once a conversation_opened callback is received, the service will be able to res
 
 Example response: {"sender": { "name": "yarden from the pa", "avatar": "http://avatar_url",}, tracking_data": "tracking data", "type": "picture", "text": "Photo description", "media":"http://www.images.com/img.jpg", "thumbnail": "http://www.images.com/thumb.jpg" }
 
- */
+*/
 type CallbackOnConversationStarted struct {
 	CallbackBase
-	MessageToken int64 `json:"message_token"`
-	Type         string `json:"type"` // "open". Additional types may be added in the future.
-	Context      string `json:"context"`
+	MessageToken int64        `json:"message_token"`
+	Type         string       `json:"type"` // "open". Additional types may be added in the future.
+	Context      string       `json:"context"`
 	User         CallbackUser `json:"user"`
 }
 

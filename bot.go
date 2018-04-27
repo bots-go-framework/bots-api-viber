@@ -1,34 +1,37 @@
 package viberbotapi
 
 import (
-	"net/http"
 	"bytes"
-	"io/ioutil"
 	"github.com/pkg/errors"
 	"github.com/pquerna/ffjson/ffjson"
 	"github.com/strongo/bots-api-viber/viberinterface"
+	"io/ioutil"
+	"net/http"
 )
 
 const (
-	VIBER_API_BASE_URL = "https://chatapi.viber.com/pa/"
+	// ViberAPIBaseURL is a base API url
+	ViberAPIBaseURL = "https://chatapi.viber.com/pa/"
 )
 
-// BotAPI allows you to interact with the Viber Bot API.
-type ViberBotApi struct {
+// ViberBotAPI allows you to interact with the Viber Bot API.
+type ViberBotAPI struct {
 	httpClient *http.Client
 	token      string
 }
 
-func NewViberBotApiWithHttpClient(token string, httpClient *http.Client) *ViberBotApi {
-	return &ViberBotApi{token: token, httpClient: httpClient}
+// NewViberBotAPIWithHTTPClient creates new API provider with HTTP client
+func NewViberBotAPIWithHTTPClient(token string, httpClient *http.Client) *ViberBotAPI {
+	return &ViberBotAPI{token: token, httpClient: httpClient}
 }
 
-func (botApi ViberBotApi) SetWebhook(url string, eventTypes []string) (response viberinterface.SetWebhookResponse, err error) {
+// SetWebhook sets webhook to the specified URL
+func (botApi ViberBotAPI) SetWebhook(url string, eventTypes []string) (response viberinterface.SetWebhookResponse, err error) {
 	var responseBody []byte
 	if _, responseBody, err = botApi.send(
 		&viberinterface.SetWebhookMessage{
-			ViberAuth: viberinterface.ViberAuth{Token: botApi.token},
-			Url: url,
+			ViberAuth:  viberinterface.ViberAuth{Token: botApi.token},
+			Url:        url,
 			EventTypes: eventTypes,
 		},
 	); err != nil {
@@ -42,7 +45,8 @@ func (botApi ViberBotApi) SetWebhook(url string, eventTypes []string) (response 
 	return
 }
 
-func (botApi ViberBotApi) SendMessage(m viberinterface.MessageToReceiver) (requestBody []byte, response viberinterface.SendMessageResponse, err error) {
+// SendMessage sends messages to Viber
+func (botApi ViberBotAPI) SendMessage(m viberinterface.MessageToReceiver) (requestBody []byte, response viberinterface.SendMessageResponse, err error) {
 	m.SetType(m.GetType())
 	m.SetToken(botApi.token)
 	var responseBody []byte
@@ -56,14 +60,14 @@ func (botApi ViberBotApi) SendMessage(m viberinterface.MessageToReceiver) (reque
 	return
 }
 
-func (botApi ViberBotApi) send(m viberinterface.MessageToViberEndpoint) (requestBody []byte, responseBody[]byte, err error) {
+func (botApi ViberBotAPI) send(m viberinterface.MessageToViberEndpoint) (requestBody []byte, responseBody []byte, err error) {
 	if requestBody, err = ffjson.MarshalFast(m); err != nil {
 		ffjson.Pool(requestBody)
 		return
 	}
 	var resp *http.Response
-	endpointUrl := VIBER_API_BASE_URL + m.Endpoint()
-	resp, err = botApi.httpClient.Post(endpointUrl, "applicaiton/json", bytes.NewReader(requestBody));
+	endpointURL := ViberAPIBaseURL + m.Endpoint()
+	resp, err = botApi.httpClient.Post(endpointURL, "applicaiton/json", bytes.NewReader(requestBody))
 	ffjson.Pool(requestBody)
 	if err != nil {
 		return
