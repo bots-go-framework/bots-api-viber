@@ -4389,7 +4389,7 @@ mainparse:
 
 handle_Url:
 
-	/* handler: uj.Url type=string kind=string quoted=false*/
+	/* handler: uj.URL type=string kind=string quoted=false*/
 
 	{
 
